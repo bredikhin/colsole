@@ -20,6 +20,16 @@ console.warn('Yellow is good enough for me...');
 console.error('And for me it is red-only!');
 ```
 
+## Configuration
+
+```javascript
+var console = require('colsole')({
+  log: 'blue'
+});
+
+console.log('Now I will be in blue.');
+```
+
 ## Dependencies
 
 - [chalk](https://www.npmjs.org/package/chalk),
