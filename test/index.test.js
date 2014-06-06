@@ -12,10 +12,11 @@ var config = _.cloneDeep(defaults);
 var console = new Colsole();
 var bait = 'Catch me!';
 
-function stdHook(originalWrite, method) {
+// Hook to assert the output
+function stdHook(originalWrite, stream, method) {
   return function() {
     if (arguments[0].indexOf(bait) === -1)
-      originalWrite.apply(process.stdout, arguments);
+      originalWrite.apply(stream, arguments);
     else
       arguments[0].replace(/\n$/, '').should.be.eql(chalk[config[method]](bait));
 
@@ -24,10 +25,12 @@ function stdHook(originalWrite, method) {
 }
 
 describe('Colsole', function() {
+  // Original `write` functions
   var _outWrite;
   var _errWrite;
 
   before(function(done) {
+    // Save the original `writes`
     _outWrite = process.stdout.write;
     _errWrite = process.stderr.write;
 
@@ -35,6 +38,7 @@ describe('Colsole', function() {
   });
 
   after(function(done) {
+    // Restore the original `writes`
     process.stdout.write = _outWrite;
     process.stderr.write = _errWrite;
 
@@ -49,8 +53,9 @@ describe('Colsole', function() {
     });
 
     it('outputs the string sent to `' + method + '` properly colored', function(done) {
-      process.stdout.write = stdHook(_outWrite, method);
-      process.stderr.write = stdHook(_errWrite, method);
+      // Attaching the hooks that contain assertions
+      process.stdout.write = stdHook(_outWrite, process.stdout, method);
+      process.stderr.write = stdHook(_errWrite, process.stderr, method);
 
       console[method](bait);
 
@@ -61,7 +66,9 @@ describe('Colsole', function() {
   it('is configurable', function(done) {
     config['error'] = 'black';
     console = new Colsole(config);
-    process.stderr.write = stdHook(_errWrite, 'error');
+
+    // Attaching the hook that contains assertion
+    process.stderr.write = stdHook(_errWrite, process.stderr, 'error');
 
     console.error(bait);
 
