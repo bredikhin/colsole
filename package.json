@@ -1,6 +1,6 @@
 {
   "name": "colsole",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Yet another colored console",
   "main": "index.js",
   "scripts": {
